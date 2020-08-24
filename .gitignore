@@ -4,4 +4,8 @@
 !*.hh
 !*Makefile
 !*.sh
+<<<<<<< HEAD
 !.gitignore
+=======
+!.gitignore
+>>>>>>> 6be126f... server fixes

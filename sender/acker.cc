@@ -50,7 +50,7 @@ void Acker::recv( void )
   outgoing.ack_number = contents->sequence_number;
   _send.send( Socket::Packet( _remote, outgoing.str( sizeof( SatPayload ) ) ) );
 
-   fprintf( _log_file,"%s DATA RECEIVED senderid=%d, seq=%d, send_time=%ld, recv_time=%ld, 1delay=%.4f \n",
+   fprintf( _log_file,"%s DATA RECEIVED senderid=%d, seq=%d, send_time=%llu, recv_time=%llu, 1delay=%.4f \n",
       _name.c_str(),  _server ? contents->sender_id : _ack_id, contents->sequence_number, contents->sent_timestamp, contents->recv_timestamp,oneway ); 
 }
 

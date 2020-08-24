@@ -81,7 +81,7 @@ vector< string > PacketSocket::recv_raw( void )
     perror( "recvfrom" );
     exit( 1 );
   } else if ( bytes_read > BUFFER_SIZE ) {
-    fprintf( stderr, "Received size (%ld) too long (> %d)!\n",
+    fprintf( stderr, "Received size (%d) too long (> %d)!\n",
 	     bytes_read, BUFFER_SIZE );
     exit( 1 );
   }

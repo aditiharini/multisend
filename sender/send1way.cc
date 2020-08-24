@@ -100,11 +100,11 @@ int main( void )
     if ( (the_time / 100000000) != (last_time / 100000000) ) {
       if ( (the_time / 20000000000) != (last_time / 20000000000) ) {
 	numextra = (numextra + 1) % 3;
-	fprintf( stderr, "%ld FLIP %d\n", (the_time - base_time) / 10000000, numextra );
+	fprintf( stderr, "%lld FLIP %d\n", (the_time - base_time) / 10000000, numextra );
       }
 
       last_time = the_time;
-      printf( "%ld %d %d %d\n", (the_time - base_time) / 100000000, last_sec_count[ 0 ], last_sec_count[ 1 ], last_sec_count[ 2 ] );
+      printf( "%lld %d %d %d\n", (the_time - base_time) / 100000000, last_sec_count[ 0 ], last_sec_count[ 1 ], last_sec_count[ 2 ] );
       fflush( NULL );
       for ( int i = 0; i < 3; i++ ) {
 	last_sec_count[ i ] = 0;
@@ -123,7 +123,7 @@ int main( void )
       /* possible timeout */
       if ( !packetstats[ next_unacked ].received ) {
 	if ( the_time - packetstats[ next_unacked ].sent_time > TIMEOUT ) {
-	  fprintf( stderr, "Timeout on %ld (sent to %d)\n", next_unacked, packetstats[ next_unacked ].dest );
+	  fprintf( stderr, "Timeout on %lld (sent to %d)\n", next_unacked, packetstats[ next_unacked ].dest );
 	  packetstats[ next_unacked ].received = true;
 	  num_outstanding[ packetstats[ next_unacked ].dest ]--;
 	}
@@ -176,7 +176,7 @@ int main( void )
 	  packetstats[ seq ].received = true;
 	  num_outstanding[ i ]--;
 	} else {
-	  fprintf( stderr, "Packet %ld arrived after timeout!\n", seq );
+	  fprintf( stderr, "Packet %lld arrived after timeout!\n", seq );
 	}
 
 	/*

@@ -81,7 +81,7 @@ int main( int argc, char *argv[] )
     uint64_t next_transmission_delay = std::min( saturatr.wait_time(), acker.wait_time() );
 
     if ( next_transmission_delay == 0 ) {
-      fprintf( stderr, "ZERO %ld %ld\n", saturatr.wait_time(), acker.wait_time() );
+      fprintf( stderr, "ZERO %lld %lld\n", saturatr.wait_time(), acker.wait_time() );
     }
 
     timeout.tv_sec = next_transmission_delay / 1000000000;

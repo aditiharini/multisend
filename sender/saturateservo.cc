@@ -65,7 +65,7 @@ void SaturateServo::recv( void )
     int64_t rtt_ns = contents->recv_timestamp - contents->sent_timestamp;
     double rtt = rtt_ns / 1.e9;
 
-    fprintf( _log_file, "%s ACK RECEIVED senderid=%d, seq=%d, send_time=%ld,  recv_time=%ld, rtt=%.4f, %d => ",
+    fprintf( _log_file, "%s ACK RECEIVED senderid=%d, seq=%d, send_time=%llu,  recv_time=%llu, rtt=%.4f, %d => ",
        _name.c_str(),_server ? _foreign_id : contents->sender_id , contents->ack_number, contents->sent_timestamp, contents->recv_timestamp, (double)rtt,  _window );
     /* increase-decrease rules */
 

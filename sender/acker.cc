@@ -78,7 +78,7 @@ int Acker::tick( void )
     _send.send( Socket::Packet( _remote, contents.str( sizeof( SatPayload ) ) ) );
 
     _next_ping_time = Socket::timestamp() + _ping_interval;
-    return 0;
+    return 1;
   }
   return 0;
 }

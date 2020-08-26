@@ -33,7 +33,7 @@ int main( int argc, char *argv[] )
   Socket::Address remote_data_address( UNKNOWN ), remote_feedback_address( UNKNOWN );
 
   uint64_t ts=Socket::timestamp();
-  if ( argc == 1 ) { /* server */
+  if ( argc == 2 ) { /* server */
     server = true;
     data_socket.bind( Socket::Address( "0.0.0.0", 9001 ) );
     feedback_socket.bind( Socket::Address( "0.0.0.0", 9002 ) );

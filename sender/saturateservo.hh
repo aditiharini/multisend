@@ -31,6 +31,8 @@ private:
 
   int _window;
 
+  int _packet_size;
+
   static const int LOWER_WINDOW = 20;
   static const int UPPER_WINDOW = 1500;
 
@@ -44,7 +46,8 @@ public:
 		 const Socket & s_send,
 		 const Socket::Address & s_remote,
 		 const bool s_server,
-		 const int s_send_id );
+		 const int s_send_id,
+     const int s_packet_size );
 
   void recv( void );
 

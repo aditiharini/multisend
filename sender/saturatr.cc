@@ -19,8 +19,10 @@ int main( int argc, char *argv[] )
   }
 
   bool test = false;
+  int packet_size = 1400;
   if (strcmp(argv[6], "test") == 0)  {
     test = true;
+    packet_size = 10;
   }
 
   Socket data_socket, feedback_socket;
@@ -62,7 +64,7 @@ int main( int argc, char *argv[] )
   sprintf(log_file_name,"%s-%d-%d",server ? "server" : "client",(int)(ts/1e9),sender_id);
   log_file=fopen(log_file_name,"w");
 
-  SaturateServo saturatr( "OUTGOING", log_file, feedback_socket, data_socket, remote_data_address, server, sender_id );
+  SaturateServo saturatr( "OUTGOING", log_file, feedback_socket, data_socket, remote_data_address, server, sender_id, packet_size);
   Acker acker( "INCOMING", log_file, data_socket, feedback_socket, remote_feedback_address, server, sender_id );
 
   saturatr.set_acker( &acker );
@@ -72,7 +74,7 @@ int main( int argc, char *argv[] )
 
   while ( 1 ) {
     fflush( NULL );
-    if (test && acker_packets_received && saturatr_packets_received && acker_packets_sent && saturatr_packets_sent) {
+    if ((test && acker_packets_received && saturatr_packets_received && saturatr_packets_sent) && (server || acker_packets_sent)) {
       fprintf(stdout, 
       "SUCCESS (acker_packets_sent: %d, acker_packets_received: %d, saturatr_packets_sent: %d, saturatr_packets_received: %d)\n",
       acker_packets_sent,

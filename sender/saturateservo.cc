@@ -11,7 +11,8 @@ SaturateServo::SaturateServo( const char * s_name,
 			      const Socket & s_send,
 			      const Socket::Address & s_remote,
 			      const bool s_server,
-			      const int s_send_id )
+			      const int s_send_id,
+            const int s_packet_size )
   : _name( s_name ),
     _log_file(log_file),
     _listen( s_listen ),
@@ -24,7 +25,8 @@ SaturateServo::SaturateServo( const char * s_name,
     _foreign_id( -1 ),
     _packets_sent( 0 ),
     _max_ack_id( -1 ),
-    _window( LOWER_WINDOW )
+    _window( LOWER_WINDOW ),
+    _packet_size( s_packet_size )
 {}
 
 void SaturateServo::recv( void )
@@ -121,7 +123,7 @@ int SaturateServo::tick( void )
       outgoing.recv_timestamp = 0;
       outgoing.sender_id = _send_id;
 
-      _send.send( Socket::Packet( _remote, outgoing.str( 1400 ) ) );
+      _send.send( Socket::Packet( _remote, outgoing.str( _packet_size) ) );
 
       /*
       printf( "%s pid=%d DATA SENT %d senderid=%d seq=%d, send_time=%ld, recv_time=%ld\n",

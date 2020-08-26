@@ -7,6 +7,7 @@
 
 #include "acker.hh"
 #include "saturateservo.hh"
+#include "payload.hh"
 
 using namespace std;
 
@@ -22,7 +23,7 @@ int main( int argc, char *argv[] )
   int packet_size = 1400;
   if (strcmp(argv[6], "test") == 0)  {
     test = true;
-    packet_size = 10;
+    packet_size = sizeof(SatPayload);
   }
 
   Socket data_socket, feedback_socket;

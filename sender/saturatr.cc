@@ -69,8 +69,8 @@ int main( int argc, char *argv[] )
 
   saturatr.set_acker( &acker );
   acker.set_saturatr( &saturatr );
-  int acker_packets_received, saturatr_packets_received = 0;
-  int acker_packets_sent, saturatr_packets_sent = 0;
+  int acker_packets_received = 0, saturatr_packets_received = 0;
+  int acker_packets_sent = 0, saturatr_packets_sent = 0;
 
   while ( 1 ) {
     fflush( NULL );

@@ -12,10 +12,15 @@ using namespace std;
 
 int main( int argc, char *argv[] )
 {
-  if ( argc != 1 && argc != 6 ) {
-    fprintf( stderr, "Usage: %s [RELIABLE_IP RELIABLE_DEV TEST_IP TEST_DEV SERVER_IP]\n",
+  if ( argc != 2 && argc != 7 ) {
+    fprintf( stderr, "Usage: %s [RELIABLE_IP RELIABLE_DEV TEST_IP TEST_DEV SERVER_IP MODE]\n",
 	     argv[ 0 ]);
     exit( 1 );
+  }
+
+  bool test = false;
+  if (strcmp(argv[6], "test") == 0)  {
+    test = true;
   }
 
   Socket data_socket, feedback_socket;
@@ -62,13 +67,25 @@ int main( int argc, char *argv[] )
 
   saturatr.set_acker( &acker );
   acker.set_saturatr( &saturatr );
+  int acker_packets_received, saturatr_packets_received = 0;
+  int acker_packets_sent, saturatr_packets_sent = 0;
 
   while ( 1 ) {
     fflush( NULL );
+    if (test && acker_packets_received && saturatr_packets_received && acker_packets_sent && saturatr_packets_sent) {
+      fprintf(stdout, 
+      "SUCCESS (acker_packets_sent: %d, acker_packets_received: %d, saturatr_packets_sent: %d, saturatr_packets_received: %d)\n",
+      acker_packets_sent,
+      acker_packets_received,
+      saturatr_packets_sent,
+      saturatr_packets_received
+      );
+      return EXIT_SUCCESS;
+    }
 
     /* possibly send packet */
-    saturatr.tick();
-    acker.tick();
+    saturatr_packets_sent += saturatr.tick();
+    acker_packets_sent += acker.tick();
     
     /* wait for incoming packet OR expiry of timer */
     struct pollfd poll_fds[ 2 ];
@@ -90,10 +107,12 @@ int main( int argc, char *argv[] )
 
     if ( poll_fds[ 0 ].revents & POLLIN ) {
       acker.recv();
+      acker_packets_received++;
     }
 
     if ( poll_fds[ 1 ].revents & POLLIN ) {
       saturatr.recv();
+      saturatr_packets_received++;
     }
   }
 }

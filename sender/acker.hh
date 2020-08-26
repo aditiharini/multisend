@@ -34,7 +34,7 @@ public:
 	 const bool s_server,
 	 const int s_ack_id );
   void recv( void );
-  void tick( void );
+  int tick( void );
 
   void set_remote( const Socket::Address & s_remote ) { _remote = s_remote; }
 

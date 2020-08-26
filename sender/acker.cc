@@ -54,16 +54,17 @@ void Acker::recv( void )
       _name.c_str(),  _server ? contents->sender_id : _ack_id, contents->sequence_number, contents->sent_timestamp, contents->recv_timestamp,oneway ); 
 }
 
-void Acker::tick( void )
+// Return true if a packet was sent, false if not
+int Acker::tick( void )
 {
   if ( _server ) {
-    return;
+    return 0;
   }
 
   /* send NAT heartbeats */
   if ( _remote == UNKNOWN ) {
     _next_ping_time = Socket::timestamp() + _ping_interval;
-    return;
+    return 0;
   }
 
   if ( _next_ping_time < Socket::timestamp() ) {
@@ -77,7 +78,9 @@ void Acker::tick( void )
     _send.send( Socket::Packet( _remote, contents.str( sizeof( SatPayload ) ) ) );
 
     _next_ping_time = Socket::timestamp() + _ping_interval;
+    return 0;
   }
+  return 0;
 }
 
 uint64_t Acker::wait_time( void ) const

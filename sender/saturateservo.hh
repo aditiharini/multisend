@@ -50,7 +50,7 @@ public:
 
   uint64_t wait_time( void ) const;
 
-  void tick( void );
+  int tick( void );
 
   void set_acker( Acker * const s_acker ) { _acker = s_acker; }
 

@@ -100,13 +100,15 @@ uint64_t SaturateServo::wait_time( void ) const
   }
 }
 
-void SaturateServo::tick( void )
+int SaturateServo::tick( void )
 {
   if ( _remote == UNKNOWN ) {
-    return;
+    return 0;
   }
 
   int num_outstanding = _packets_sent - _max_ack_id - 1;
+
+  int packets_sent_this_tick = 0;
 
   if ( num_outstanding < _window ) {
     /* send more packets */
@@ -128,6 +130,8 @@ void SaturateServo::tick( void )
       _packets_sent++;
     }
 
+    packets_sent_this_tick = amount_to_send;
+
     _next_transmission_time = Socket::timestamp() + _transmission_interval;
   }
 
@@ -146,7 +150,10 @@ void SaturateServo::tick( void )
     _name.c_str(), getpid(), outgoing.sender_id, outgoing.sequence_number, outgoing.sent_timestamp, outgoing.recv_timestamp ); */
 
     _packets_sent++;
+    packets_sent_this_tick++;
 
     _next_transmission_time = Socket::timestamp() + _transmission_interval;
   }
+
+  return packets_sent_this_tick;
 }

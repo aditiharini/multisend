@@ -21,10 +21,6 @@ int main( int argc, char *argv[] )
 
   bool test = false;
   int packet_size = 1400;
-  if (strcmp(argv[6], "test") == 0)  {
-    test = true;
-    packet_size = sizeof(SatPayload);
-  }
 
   Socket data_socket, feedback_socket;
   bool server;
@@ -36,10 +32,18 @@ int main( int argc, char *argv[] )
   uint64_t ts=Socket::timestamp();
   if ( argc == 2 ) { /* server */
     server = true;
+    if (strcmp(argv[1], "test") == 0)  {
+      test = true;
+      packet_size = sizeof(SatPayload);
+    }
     data_socket.bind( Socket::Address( "0.0.0.0", 9001 ) );
     feedback_socket.bind( Socket::Address( "0.0.0.0", 9002 ) );
   } else { /* client */
     server = false;
+    if (strcmp(argv[6], "test") == 0)  {
+      test = true;
+      packet_size = sizeof(SatPayload);
+    }
     
     const char *reliable_ip = argv[ 1 ];
     const char *reliable_dev = argv[ 2 ];
@@ -74,16 +78,36 @@ int main( int argc, char *argv[] )
   int acker_packets_sent = 0, saturatr_packets_sent = 0;
 
   while ( 1 ) {
-    fflush( NULL );
-    if ((test && acker_packets_received && saturatr_packets_received && saturatr_packets_sent) && (server || acker_packets_sent)) {
       fprintf(stdout, 
-      "SUCCESS (acker_packets_sent: %d, acker_packets_received: %d, saturatr_packets_sent: %d, saturatr_packets_received: %d)\n",
+      "WAITING (acker_packets_sent: %d, acker_packets_received: %d, saturatr_packets_sent: %d, saturatr_packets_received: %d)\n",
       acker_packets_sent,
       acker_packets_received,
       saturatr_packets_sent,
       saturatr_packets_received
       );
-      return EXIT_SUCCESS;
+    fflush( NULL );
+    if (test) {
+      std::string fmt_str = "%s (acker_packets_sent: %d, acker_packets_received: %d, saturatr_packets_sent: %d, saturatr_packets_received: %d)\n";
+      if ((acker_packets_received && saturatr_packets_received && saturatr_packets_sent) && (server || acker_packets_sent)) {
+        fprintf(stdout, 
+        fmt_str.c_str(),
+        "SUCCESS",
+        acker_packets_sent,
+        acker_packets_received,
+        saturatr_packets_sent,
+        saturatr_packets_received
+        );
+        return EXIT_SUCCESS;
+      } else {
+        fprintf(stdout, 
+        fmt_str.c_str(),
+        "WAITING",
+        acker_packets_sent,
+        acker_packets_received,
+        saturatr_packets_sent,
+        saturatr_packets_received
+        );
+      }
     }
 
     /* possibly send packet */

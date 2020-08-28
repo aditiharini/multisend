@@ -4,12 +4,20 @@
 #include <assert.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cpr/cpr.h>
 
 #include "acker.hh"
 #include "saturateservo.hh"
 #include "payload.hh"
 
 using namespace std;
+
+void send_monitoring(cpr::Url url, cpr::Payload payload) {
+  cpr::Response res = cpr::Post(url, cpr::Timeout{2000}, payload); 
+  if (res.error.code != cpr::ErrorCode::OK) {
+    fprintf( stderr, "Unable to send monitoring\n");
+  }
+}
 
 int main( int argc, char *argv[] )
 {
@@ -29,6 +37,7 @@ int main( int argc, char *argv[] )
 
   Socket::Address remote_data_address( UNKNOWN ), remote_feedback_address( UNKNOWN );
 
+  string monitoring_url = "";
   uint64_t ts=Socket::timestamp();
   if ( argc == 2 ) { /* server */
     server = true;
@@ -38,6 +47,7 @@ int main( int argc, char *argv[] )
     }
     data_socket.bind( Socket::Address( "0.0.0.0", 9001 ) );
     feedback_socket.bind( Socket::Address( "0.0.0.0", 9002 ) );
+    monitoring_url += "localhost:10000/server/saturatr";
   } else { /* client */
     server = false;
     if (strcmp(argv[6], "test") == 0)  {
@@ -62,6 +72,8 @@ int main( int argc, char *argv[] )
     feedback_socket.bind( Socket::Address( reliable_ip, 9004 ) );
     feedback_socket.bind_to_device( reliable_dev );
     remote_feedback_address = Socket::Address( server_ip, 9002 );
+    Socket::Address monitoring_addr = Socket::Address(server_ip, 10000);
+    monitoring_url += monitoring_addr.str() + "/drone/saturatr";
   }
 
   FILE* log_file;
@@ -78,13 +90,6 @@ int main( int argc, char *argv[] )
   int acker_packets_sent = 0, saturatr_packets_sent = 0;
 
   while ( 1 ) {
-      fprintf(stdout, 
-      "WAITING (acker_packets_sent: %d, acker_packets_received: %d, saturatr_packets_sent: %d, saturatr_packets_received: %d)\n",
-      acker_packets_sent,
-      acker_packets_received,
-      saturatr_packets_sent,
-      saturatr_packets_received
-      );
     fflush( NULL );
     if (test) {
       std::string fmt_str = "%s (acker_packets_sent: %d, acker_packets_received: %d, saturatr_packets_sent: %d, saturatr_packets_received: %d)\n";
@@ -108,6 +113,16 @@ int main( int argc, char *argv[] )
         saturatr_packets_received
         );
       }
+    } else {
+      send_monitoring(
+        cpr::Url{monitoring_url}, 
+        cpr::Payload{
+          {"acker_packets_sent", to_string(acker_packets_sent)},
+          {"acker_packets_received", to_string(acker_packets_received)},
+          {"saturatr_packets_sent", to_string(saturatr_packets_sent)},
+          {"saturatr_packets_received", to_string(saturatr_packets_received)}
+        }
+      );
     }
 
     /* possibly send packet */

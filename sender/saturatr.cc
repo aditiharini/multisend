@@ -88,6 +88,7 @@ int main( int argc, char *argv[] )
   acker.set_saturatr( &saturatr );
   int acker_packets_received = 0, saturatr_packets_received = 0;
   int acker_packets_sent = 0, saturatr_packets_sent = 0;
+  uint64_t next_monitor_send_time = Socket::timestamp();
 
   while ( 1 ) {
     fflush( NULL );
@@ -114,15 +115,18 @@ int main( int argc, char *argv[] )
         );
       }
     } else {
-      send_monitoring(
-        cpr::Url{monitoring_url}, 
-        cpr::Payload{
-          {"acker_packets_sent", to_string(acker_packets_sent)},
-          {"acker_packets_received", to_string(acker_packets_received)},
-          {"saturatr_packets_sent", to_string(saturatr_packets_sent)},
-          {"saturatr_packets_received", to_string(saturatr_packets_received)}
-        }
-      );
+      if (next_monitor_send_time < Socket::timestamp()) {
+        send_monitoring(
+          cpr::Url{monitoring_url}, 
+          cpr::Payload{
+            {"acker_packets_sent", to_string(acker_packets_sent)},
+            {"acker_packets_received", to_string(acker_packets_received)},
+            {"saturatr_packets_sent", to_string(saturatr_packets_sent)},
+            {"saturatr_packets_received", to_string(saturatr_packets_received)}
+          }
+        );
+        next_monitor_send_time = Socket::timestamp() + 1000000000;
+      }
     }
 
     /* possibly send packet */
